@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
@@ -13,12 +14,28 @@ public class Weapon : MonoBehaviour
 
     private PlayerController _player = null;
 
+    public PlayerController Player { get { return _player; } set { SetHolder(value); } }
+
+    private void SetHolder(PlayerController value)
+    {
+        _player = value;
+
+        if(_player != null)
+        {
+            InputManager.Instance.SwitchBulletType += ChooseBulletType;
+        }
+        else
+        {
+            InputManager.Instance.SwitchBulletType -= ChooseBulletType;
+        }
+    }
+
     private void Start()
     {
         ChooseBulletType(_startingType);
     }
 
-    public void ChooseBulletType(E_FireType type)
+    private void ChooseBulletType(E_FireType type)
     {
         if(_player != null)
         {
@@ -32,7 +49,7 @@ public class Weapon : MonoBehaviour
                 case E_FireType.CLASSIC:
                     _player.WeaponAction += Classic;
                     break;
-                case E_FireType.ATL_1:
+                case E_FireType.ALT_1:
                     _player.WeaponAction += Alt_1;
                     break;
                 case E_FireType.ALT_2:
@@ -49,7 +66,15 @@ public class Weapon : MonoBehaviour
 
     private void Classic()
     {
-        Instantiate(_classic, _shootingObj.position, _shootingObj.rotation);
+        RaycastHit hit;
+        bool hasHit = Physics.Raycast(_shootingObj.position, _shootingObj.forward, out hit);
+
+        Projectile projectile = Instantiate(_classic, _shootingObj.position, _shootingObj.rotation);
+        if(hasHit == true)
+        {
+            Transform transform = hit.transform;
+            projectile.Init(transform);
+        }
     }
 
     private void Alt_1()
@@ -76,5 +101,8 @@ public class Weapon : MonoBehaviour
             _player.WeaponAction -= Alt_2;
             _player.WeaponAction -= Alt_3;
         }
+
+        if(InputManager.Instance != null)
+            InputManager.Instance.SwitchBulletType -= ChooseBulletType;
     }
 }

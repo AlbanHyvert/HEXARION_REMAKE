@@ -56,15 +56,13 @@ public class TurretShootingState : ITurrets
         if(_mag <= 0)
         {
             _self.ChangeState(E_Turret.RELOADING);
-        }
-
-        
+        }     
 
         if(_player != null)
         {
             Quaternion lookTarget = Quaternion.LookRotation((_player.CameraController.transform.position - _transform.position).normalized);
 
-            _transform.rotation = Quaternion.Slerp(_transform.rotation, lookTarget, _rotSpeed * Time.deltaTime);
+            _transform.rotation = Quaternion.Slerp(_transform.rotation, lookTarget, (_rotSpeed - _self.SlowDownSpeed + _self.AccelSpeed) * Time.deltaTime);
         }
 
         if(_timePass > _time)

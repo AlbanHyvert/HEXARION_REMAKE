@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour
     private float _speed = 5;
     private float _tempSpeed = 0;
     private float _slowDownSpeed = 0;
+    private float _accelSpeed = 0;
     private int _sprintMult;
     private int _sprintMinMult = 1;
     private int _sprintMaxMult = 2;
@@ -45,8 +46,10 @@ public class PlayerController : MonoBehaviour
     public AudioSource MusicAudioSource { get { return _musicAudioSource; } }
     public AudioSource DialsAudioSource { get { return _dialsAudioSource; } }
     public CameraController CameraController { get { return _cameraController; } }
+    public Weapon Weapon { get { return _weapon; } }
     public float Speed { get { return _speed; } }
     public float SlowDownSpeed { get { return _slowDownSpeed; } set { SetSlowDownSpeed(value); } }
+    public float AccelSpeed { get { return _accelSpeed; } set { SetAccelSpeed(value); } }
     public float Gravity { get { return _gravity; } }
     public bool IsInteract { get { return _isInteract; } set { IsInteractable(value); } }
     public int HP { get { return _HP; } }
@@ -89,7 +92,10 @@ public class PlayerController : MonoBehaviour
         InputManager.Instance.PressSprint += OnSprint;
         InputManager.Instance.ReleaseSprint += OnWalk;
         InputManager.Instance.Gravity += OnGravity;
-        
+
+        _slowDownSpeed = 0;
+        _accelSpeed = 0;
+
         Init();
     }
 
@@ -117,14 +123,18 @@ public class PlayerController : MonoBehaviour
 
         if(_isHoldingWeapon == true)
         {
-            _weapon.ChooseBulletType(E_FireType.CLASSIC);
+            _weapon.Player = this;
             InputManager.Instance.Throw += Fire;
         }
         else
         {
             InputManager.Instance.Throw -= Fire;
-        }
-        
+        }    
+    }
+
+    private void SetAccelSpeed(float value)
+    {
+        _accelSpeed = value;
     }
 
     private void SetSlowDownSpeed(float slowForce)
@@ -247,7 +257,10 @@ public class PlayerController : MonoBehaviour
 
     private void OnUpdate()
     {
-        _currentSpeed = Mathf.Lerp(_currentSpeed, _speed - _slowDownSpeed, _smoothTime * Time.deltaTime);
+        _currentSpeed = Mathf.Lerp(_currentSpeed, (_speed - _slowDownSpeed + _accelSpeed), _smoothTime * Time.deltaTime);
+
+        if (_currentSpeed < 0)
+            _currentSpeed = 0;
 
         OnRaycast();
     }
@@ -281,6 +294,7 @@ public class PlayerController : MonoBehaviour
     private void OnPickUp()
     {
         IAction action = _interactableObject.GetComponent<IAction>();
+        Weapon weapon = _interactableObject.GetComponent<Weapon>();
 
         if(_interactableObject != null && action != null)
         {
@@ -292,6 +306,14 @@ public class PlayerController : MonoBehaviour
             InputManager.Instance.Throw += OnThrow;
             InputManager.Instance.Interaction -= OnPickUp;
             InputManager.Instance.Interaction -= OnInteract;
+        }
+        
+        if(weapon != null)
+        {
+            _weapon = weapon;
+            _weapon.transform.position = _cameraController.GunHolder.position;
+            _weapon.transform.SetParent(_cameraController.transform);
+            IsHoldingAWeapon = true;
         }
     }
 

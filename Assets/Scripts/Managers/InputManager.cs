@@ -20,13 +20,30 @@ public class InputManager : Singleton<InputManager>
     private int _horizontalSensitivity = 10;
 
     private Vector3 _direction = Vector3.zero;
+    private E_FireType _currentBulletType = E_FireType.CLASSIC;
 
     public Vector3 Direction { get { return _direction; } }
     public int VerticalSensitivity { get { return _verticalSensitivity; } set { _verticalSensitivity = value; } }
     public int HorizontalSensitivity { get { return _horizontalSensitivity; } set { _horizontalSensitivity = value; } }
     public  DataKeycode DataKeycode { get { return _dataKeyCode; } }
 
+    public E_FireType CurrentFireType { get { return _currentBulletType; } set { SetCurrentBulletType(value); } }
+
     #region EVENTS
+    private event Action<E_FireType> _switchBulletType = null;
+    public event Action<E_FireType> SwitchBulletType
+    {
+        add
+        {
+            _switchBulletType -= value;
+            _switchBulletType += value;
+        }
+        remove
+        {
+            _switchBulletType -= value;
+        }
+    }
+
     private event Action<Vector3> _movement = null;
     public event Action<Vector3> Movement
     {
@@ -154,6 +171,12 @@ public class InputManager : Singleton<InputManager>
     }
     #endregion EVENTS
 
+    private void SetCurrentBulletType(E_FireType bulletType)
+    {
+        _currentBulletType = bulletType;
+        _switchBulletType(_currentBulletType);
+    }
+
     public void ChangeKey(Keys keys, KeyCode keyCode)
     {
         if(keys == Keys.FORWARD)
@@ -235,6 +258,26 @@ public class InputManager : Singleton<InputManager>
             }
         }
 
+        if(_switchBulletType != null)
+        {
+            if(Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Ampersand))
+            {
+                CurrentFireType = E_FireType.CLASSIC;
+            }
+            else if(Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                CurrentFireType = E_FireType.ALT_1;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.DoubleQuote))
+            {
+                CurrentFireType = E_FireType.ALT_2;
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Quote))
+            {
+                CurrentFireType = E_FireType.ALT_3;
+            }
+        }
+
         if(_interaction != null && Input.GetKeyDown(_dataKeyCode.KeyInteraction))
         {
             _interaction();
@@ -248,11 +291,6 @@ public class InputManager : Singleton<InputManager>
         if (_releaseSprint != null && Input.GetKeyUp(_dataKeyCode.KeySprint))
         {
             _releaseSprint();
-        }
-
-        if(_passDialogue != null && Input.GetKeyDown(_dataKeyCode.KeyDialogue))
-        {
-            _passDialogue();
         }
 
         if(_throw != null && Input.GetMouseButtonDown(0))

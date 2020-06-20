@@ -19,6 +19,8 @@ public class TurretsAI : MonoBehaviour
     private PlayerController _player = null;
     private E_Turret _currentState = E_Turret.SEARCHING;
     private Dictionary<E_Turret, ITurrets> _states = null;
+    private float _slowDownSpeed = 0;
+    private float _accelSpeed = 0;
     private double _rotationSpeed = 5;
     private double _rotationSmooth = 5;
     private double _viewDistance = 30;
@@ -46,11 +48,23 @@ public class TurretsAI : MonoBehaviour
     public int ViewField { get { return _viewField; } }
     public double ViewDistance { get { return _viewDistance; } }
     public double RotationSpeed { get { return _rotationSpeed; } }
+    public float SlowDownSpeed { get { return _slowDownSpeed; } set { SetSlowDownSpeed(value); } }
+    public float AccelSpeed { get { return _accelSpeed; } set { SetAccelSpeed(value); } }
     public double RotationSmooth { get { return _rotationSmooth; } }
     public int MaxMagazine { get { return _maxMagazine; } }
     public int Magazine { get { return _magazine; } set { SetMagValue(value); } }
     public double RateOfFire { get { return _rateOfFire; } }
     #endregion PROPERTIES
+
+    private void SetSlowDownSpeed(float value)
+    {
+        _slowDownSpeed = value;
+    }
+
+    private void SetAccelSpeed(float value)
+    {
+        _accelSpeed = value;
+    }
 
     private void SetHPValue(int dmg)
     {
@@ -86,6 +100,9 @@ public class TurretsAI : MonoBehaviour
         _states = new Dictionary<E_Turret, ITurrets>();
 
         _currentState = _startingState;
+
+        _slowDownSpeed = 0;
+        _accelSpeed = 0;
 
         Init();
 
@@ -141,7 +158,7 @@ public class TurretsAI : MonoBehaviour
     public void Shoot(Projectile projectile, Vector3 pos, Quaternion rot)
     {
         Projectile bullet = Instantiate(projectile, _shootingPos.position, _shootingPos.rotation);
-        bullet.Init(_player);
+        bullet.Init(_player.transform);
     }
 
     public void ChangeState(E_Turret nextState)

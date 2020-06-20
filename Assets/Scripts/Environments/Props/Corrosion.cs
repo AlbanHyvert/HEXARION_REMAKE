@@ -49,8 +49,10 @@ public class Corrosion : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        _player.SlowDownSpeed = 0;
         if(_player != null)
-            _player = null;
+        {
+            _player.SlowDownSpeed = 0;
+        }
+        _player = null;
     }
 }

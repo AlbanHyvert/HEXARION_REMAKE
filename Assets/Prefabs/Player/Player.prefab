@@ -316,8 +316,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _stats:
-    _rotationXSpeed: 10
-    _rotationYSpeed: 10
+    _rotationXSpeed: 3
+    _rotationYSpeed: 3
     _smoothTime: 5
     _bobbingSpeed: 0.2
     _bobbingForce: 0.2
@@ -328,6 +328,7 @@ MonoBehaviour:
     _slowDownAmount: 1
   _body: {fileID: 3289561592814387867}
   _hand: {fileID: 3289561590974629162}
+  _gunHolder: {fileID: 1921453890207566791}
   _camera: {fileID: 3289561591405136605}
   _headBobbing: {fileID: 2016263633102645025}
 --- !u!1 &3289561592361314101
@@ -503,7 +504,7 @@ MonoBehaviour:
     _throwForce: 20
     _activeLayer:
       serializedVersion: 2
-      m_Bits: 512
+      m_Bits: 4608
 --- !u!1 &4782491169299053530
 GameObject:
   m_ObjectHideFlags: 0

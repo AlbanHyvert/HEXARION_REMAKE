@@ -77,7 +77,7 @@ public class TurretSearchingState : ITurrets
         {
             Vector3 StartEulerAngle = new Vector3(_self.transform.eulerAngles.x, _startEulerAngle.y, _self.transform.eulerAngles.z);
             float distFormOriginalRot = Vector3.Distance(_self.transform.eulerAngles, _startEulerAngle);
-
+            
             _self.transform.eulerAngles = Vector3.Lerp(_self.transform.eulerAngles, StartEulerAngle, 1 * Time.deltaTime);
 
             if (distFormOriginalRot < 0.2f)
@@ -97,8 +97,8 @@ public class TurretSearchingState : ITurrets
 
             if (_isArrived == false)
             {
-                _timePass += 0.01f * Time.deltaTime;
-                _self.transform.eulerAngles = Vector3.Lerp(_self.transform.eulerAngles, minRot, _timePass);
+                _timePass = Time.deltaTime;
+                _self.transform.eulerAngles = Vector3.Lerp(_self.transform.eulerAngles, minRot, (_rotSpeed - _self.SlowDownSpeed + _self.AccelSpeed) * _timePass);
 
                 if (distFromMinRotation < 0.1f)
                 {
@@ -109,8 +109,8 @@ public class TurretSearchingState : ITurrets
             }
             else
             {
-                _timePass += 0.01f * Time.deltaTime;
-                _self.transform.eulerAngles = Vector3.Lerp(_self.transform.eulerAngles, maxRot, _timePass);
+                _timePass =  Time.deltaTime;
+                _self.transform.eulerAngles = Vector3.Lerp(_self.transform.eulerAngles, maxRot, (_rotSpeed - _self.SlowDownSpeed + _self.AccelSpeed) * _timePass);
 
                 if (distFromMaxRotation < 0.1f)
                 {

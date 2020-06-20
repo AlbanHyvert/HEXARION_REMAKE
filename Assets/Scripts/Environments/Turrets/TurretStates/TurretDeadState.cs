@@ -23,6 +23,6 @@ public class TurretDeadState : ITurrets
 
     void ITurrets.Tick()
     {
-        throw new System.NotImplementedException();
+        //deadAnim
     }
 }

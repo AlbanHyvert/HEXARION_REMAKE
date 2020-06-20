@@ -6,10 +6,12 @@ public class CameraController : MonoBehaviour
     [Space]
     [SerializeField] private Transform _body = null;
     [SerializeField] private Transform _hand = null;
+    [SerializeField] private Transform _gunHolder = null;
     [SerializeField] private Camera _camera = null;
     [SerializeField] private HeadBobbing _headBobbing = null;
 
     #region PRIVATE
+    private PlayerController _player = null;
     private int _rotationXSpeed = 0;
     private int _rotationYSpeed = 0;
     private float _rotationX = 0;
@@ -26,6 +28,7 @@ public class CameraController : MonoBehaviour
     #endregion PRIVATE
 
     public Transform Hand { get { return _hand; } }
+    public Transform GunHolder { get { return _gunHolder; } }
     public Camera Camera { get { return _camera; } }
 
     public int RotationXSpeed { get { return _rotationXSpeed; } }
@@ -38,6 +41,8 @@ public class CameraController : MonoBehaviour
 
         InputManager.Instance.HorizontalSensitivity = _rotationXSpeed;
         InputManager.Instance.VerticalSensitivity = _rotationYSpeed;
+
+        _player = PlayerManager.Instance.Player;
 
         _power = _stats.Power;
         _duration = _stats.Duration;
@@ -111,8 +116,8 @@ public class CameraController : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
 
-        mouseX *= _rotationXSpeed * Time.deltaTime;
-        mouseY *= _rotationYSpeed * Time.deltaTime;
+        mouseX *= _rotationXSpeed;
+        mouseY *= _rotationYSpeed;
 
         _currentX = Mathf.Lerp(_currentX, mouseX, _smoothTime * Time.deltaTime);
         _currentY = Mathf.Lerp(_currentY, mouseY, _smoothTime * Time.deltaTime);
@@ -120,9 +125,16 @@ public class CameraController : MonoBehaviour
         _rotationX = _body.localEulerAngles.y + _currentX * _rotationXSpeed;
 
         _rotationY += _currentY * _rotationYSpeed;
-        _rotationY = Mathf.Clamp(_rotationY, -90, 90);
+        _rotationY = Mathf.Clamp(_rotationY, -80, 80);
 
         _body.rotation = Quaternion.Euler(new Vector3(0, _rotationX, 0));
         _camera.transform.localRotation = Quaternion.Euler(-_rotationY, 0, 0);
+
+        _gunHolder.rotation = Quaternion.Euler(_gunHolder.eulerAngles.x, _camera.transform.eulerAngles.y, _gunHolder.eulerAngles.z);
+
+        if(_player.Weapon != null)
+        {
+            _player.Weapon.transform.rotation = _gunHolder.rotation;
+        }
     }
 }
