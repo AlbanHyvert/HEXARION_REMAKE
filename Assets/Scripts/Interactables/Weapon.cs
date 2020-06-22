@@ -66,15 +66,8 @@ public class Weapon : MonoBehaviour
 
     private void Classic()
     {
-        RaycastHit hit;
-        bool hasHit = Physics.Raycast(_shootingObj.position, _shootingObj.forward, out hit);
-
         Projectile projectile = Instantiate(_classic, _shootingObj.position, _shootingObj.rotation);
-        if(hasHit == true)
-        {
-            Transform transform = hit.transform;
-            projectile.Init(transform);
-        }
+        projectile.Init();
     }
 
     private void Alt_1()

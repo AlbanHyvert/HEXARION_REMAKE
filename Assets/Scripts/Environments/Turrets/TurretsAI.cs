@@ -178,7 +178,7 @@ public class TurretsAI : MonoBehaviour
     public void Shoot(Projectile projectile, Vector3 pos, Quaternion rot)
     {
         Projectile bullet = Instantiate(projectile, _shootingPos.position, _shootingPos.rotation);
-        bullet.Init(_player.transform);
+        bullet.Init();
     }
 
     public void ChangeState(E_Turret nextState)

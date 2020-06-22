@@ -1,5 +1,4 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Projectile : MonoBehaviour
@@ -19,6 +18,7 @@ public class Projectile : MonoBehaviour
     [SerializeField] private Transform _teleportHolder = null;
     #endregion SERIALIZEFIELD
 
+    #region PRIVATE
     private bool _checkTarget = true;
     private Rigidbody _rb = null;
     private Collider _col = null;
@@ -29,15 +29,18 @@ public class Projectile : MonoBehaviour
     private Transform _teleportationPoint = null;
     private Transform _holder = null;
     private float _timePass = 0;
+    #endregion PRIVATE
 
+    #region PROPERTIES
     public E_BulletType Type { get { return _type; } }
     public Transform TeleportAtPosition { get { return _teleportAtPosition; } set { _teleportAtPosition = value; } }
     public Transform TeleportHolder { get { return _teleportHolder; } set { _teleportHolder = value; } }
     public Transform Target { get { return _target; } set { SetTarget(value); ; } }
     public Transform Holder { get { return _holder; } set { _holder = value; } }
     public Transform TeleportationPoint { get { return _teleportationPoint; } set { _teleportationPoint = value; } }
+    #endregion PROPERTIES
 
-    public void Init(Transform target)
+    public void Init()
     {
         _lifeTime = (float)_classicTypeStats.LifeTime + Time.time;
 
@@ -109,8 +112,6 @@ public class Projectile : MonoBehaviour
 
         if(hasTarget == true)
         {
-            Debug.Log(hit.transform.name);
-
             float distFromTarget = Vector3.Distance(transform.position, hit.transform.position);
 
             if (distFromTarget < 3 && distFromTarget > 0)
@@ -138,39 +139,43 @@ public class Projectile : MonoBehaviour
 
     private void TeleportTarget()
     {
-        if (_target == null)
-        {
-            Destroy(gameObject);
-        }
-
         transform.position += transform.forward * ((float)_TPAtTypeStats.Speed * Time.deltaTime);
 
-        if (Time.time > _TPAtTypeStats.LifeTime)
+        _timePass += 1 * Time.deltaTime;
+
+        if (_timePass > _TPAtTypeStats.LifeTime)
         {
             Destroy(gameObject);
         }
 
-        bool HasTarget = Physics.Linecast(transform.position, _target.transform.position);
+        RaycastHit hit;
 
-        if (HasTarget == true)
+        bool hasTarget = Physics.Raycast(transform.position, transform.forward, out hit, (float)_classicTypeStats.MaxDistanceCheck);
+
+        if (hasTarget == true)
         {
-            float DistFromPlayer = Vector3.Distance(transform.position, _target.transform.position);
 
-            if (DistFromPlayer < 3 && DistFromPlayer > 2)
+            float distFromTarget = Vector3.Distance(transform.position, hit.transform.position);
+
+            if (distFromTarget < 3 && distFromTarget > 0)
             {
-                if(_teleportationPoint != null)
+                if (_checkTarget == true)
                 {
-                    if (_player != null)
-                    {
-                        _player.transform.position = _teleportationPoint.position;
-                        _player.transform.rotation = _teleportationPoint.rotation;
-                    }
-                    else if (_turrets != null)
-                    {
-                        _turrets.transform.position = _teleportationPoint.position;
-                        _turrets.transform.rotation = _teleportationPoint.rotation;
-                    }
+                    SetTarget(hit.transform);
+                    _checkTarget = false;
                 }
+
+                if (_player != null)
+                {
+                    _player.transform.position = _teleportationPoint.position;
+                    _player.transform.rotation = _teleportationPoint.rotation;
+                }
+                else if (_turrets != null)
+                {
+                    _turrets.transform.position = _teleportationPoint.position;
+                    _turrets.transform.rotation = _teleportationPoint.rotation;
+                }
+
                 GameLoopManager.Instance.Ennemies -= TeleportTarget;
                 Destroy(gameObject);
             }
@@ -179,49 +184,48 @@ public class Projectile : MonoBehaviour
 
     private void TeleportAt()
     {
-        if (_target == null)
-        {
-            Destroy(gameObject);
-        }
-
         transform.position += transform.forward * ((float)_TPHolderTypeStats.Speed * Time.deltaTime);
 
-        if (Time.time > _TPHolderTypeStats.LifeTime)
+         _timePass += 1 * Time.deltaTime;
+
+        if (_timePass > _lifeTime)
         {
             Destroy(gameObject);
         }
 
-        bool HasTarget = Physics.Linecast(transform.position, _target.transform.position);
+        RaycastHit hit;
 
-        if (HasTarget == true)
+        bool hasTarget = Physics.Raycast(transform.position, transform.forward, out hit, (float)_classicTypeStats.MaxDistanceCheck);
+
+        if(hasTarget == true)
         {
-            float DistFromPlayer = Vector3.Distance(transform.position, _target.transform.position);
+            float distFromTarget = Vector3.Distance(transform.position, hit.transform.position);
 
-            if (DistFromPlayer < 3 && DistFromPlayer > 2)
+            if (distFromTarget < 3 && distFromTarget > 0)
             {
-                if (_holder != null)
+                if(_holder != null)
                 {
-                    _holder.position = _target.position - _holder.GetComponent<Collider>().bounds.size;
+                    _holder.position = hit.transform.position - _holder.GetComponent<Collider>().bounds.size;
                 }
+
                 GameLoopManager.Instance.Ennemies -= TeleportAt;
                 Destroy(gameObject);
             }
-        }
+        }    
     }
 
     private void Slow()
     {
-        if (_target == null)
-        {
-            Destroy(gameObject);
-        }
+        if (transform.parent == null)
+            transform.position += transform.forward * ((float)_slowTypeStats.Speed * Time.deltaTime);
 
-        transform.position += transform.forward * ((float)_slowTypeStats.Speed * Time.deltaTime);
         _timePass += 1 * Time.deltaTime;
 
         if (_timePass > _slowTypeStats.LifeTime)
         {
-            if(_player != null)
+            transform.SetParent(null);
+
+            if (_player != null)
                 _player.SlowDownSpeed = 0;
 
             if (_turrets != null)
@@ -230,14 +234,25 @@ public class Projectile : MonoBehaviour
             Destroy(gameObject);
         }
 
-        bool HasTarget = Physics.Linecast(transform.position, _target.transform.position);
+        RaycastHit hit;
 
-        if (HasTarget == true)
+        bool hasTarget = Physics.Raycast(transform.position, transform.forward, out hit, (float)_classicTypeStats.MaxDistanceCheck);
+
+        if (hasTarget == true)
         {
-            float DistFromPlayer = Vector3.Distance(transform.position, _target.transform.position);
+            float distFromTarget = Vector3.Distance(transform.position, hit.transform.position);
 
-            if (DistFromPlayer < 3 && DistFromPlayer > 2)
+            if (distFromTarget < 3 && distFromTarget > 0)
             {
+                if (_checkTarget == true)
+                {
+                    SetTarget(hit.transform);
+                    _checkTarget = false;
+                }
+
+                transform.SetParent(hit.transform);
+                _rb.isKinematic = true;
+
                 if (_player != null)
                 {
                     _player.SlowDownSpeed = _slowTypeStats.TargetDivideSpeed;
@@ -246,18 +261,20 @@ public class Projectile : MonoBehaviour
                 {
                     _turrets.SlowDownSpeed = _slowTypeStats.TargetDivideSpeed;
                 }
-                
-                if(_timePass > _slowTypeStats.Duration)
-                {
-                    if(_player != null)
-                        _player.SlowDownSpeed = 0;
 
-                    if(_turrets != null)
-                        _turrets.SlowDownSpeed = 0;
+                if (_timePass > _accelTypeStats.Duration)
+                {
+                    transform.SetParent(null);
+
+                    if (_player != null)
+                        _player.AccelSpeed = 0;
+
+                    if (_turrets != null)
+                        _turrets.AccelSpeed = 0;
 
                     GameLoopManager.Instance.Ennemies -= Slow;
                     Destroy(gameObject);
-                }                
+                }
             }
         }
     }
@@ -269,12 +286,6 @@ public class Projectile : MonoBehaviour
 
     private void Acceleration()
     {
-        if (_target == null)
-        {
-            transform.SetParent(null);
-            Destroy(gameObject);
-        }
-
         if(transform.parent == null)
             transform.position += transform.forward * ((float)_accelTypeStats.Speed * Time.deltaTime);
 
@@ -293,20 +304,28 @@ public class Projectile : MonoBehaviour
             Destroy(gameObject);
         }
 
-        bool HasTarget = Physics.Linecast(transform.position, _target.transform.position);
+        RaycastHit hit;
 
-        if (HasTarget == true)
+        bool hasTarget = Physics.Raycast(transform.position, transform.forward, out hit, (float)_classicTypeStats.MaxDistanceCheck);
+
+        if (hasTarget == true)
         {
-            float DistFromPlayer = Vector3.Distance(transform.position, _target.transform.position);
+            float distFromTarget = Vector3.Distance(transform.position, hit.transform.position);
 
-            if (DistFromPlayer < 3 && DistFromPlayer > 2)
+            if (distFromTarget < 3 && distFromTarget > 0)
             {
-                transform.SetParent(_target);
+                if (_checkTarget == true)
+                {
+                    SetTarget(hit.transform);
+                    _checkTarget = false;
+                }
+
+                transform.SetParent(hit.transform);
                 _rb.isKinematic = true;
 
                 if (_player != null)
                 {
-                    _player.SlowDownSpeed = _accelTypeStats.TargetMultSpeed;
+                    _player.AccelSpeed = _accelTypeStats.TargetMultSpeed;
                 }
                 else if (_turrets != null)
                 {
@@ -332,7 +351,53 @@ public class Projectile : MonoBehaviour
 
     private void Corrosion()
     {
+        if (transform.parent == null)
+            transform.position += transform.forward * ((float)_corosiveTypeStats.Speed * Time.deltaTime);
 
+        _timePass += 1 * Time.deltaTime;
+
+        if (_timePass > _corosiveTypeStats.LifeTime)
+        {
+            transform.SetParent(null);
+            Destroy(gameObject);
+        }
+
+        RaycastHit hit;
+
+        bool hasTarget = Physics.Raycast(transform.position, transform.forward, out hit, (float)_classicTypeStats.MaxDistanceCheck);
+
+        if (hasTarget == true)
+        {
+            float distFromTarget = Vector3.Distance(transform.position, hit.transform.position);
+
+            if (distFromTarget < 3 && distFromTarget > 0)
+            {
+                if (_checkTarget == true)
+                {
+                    SetTarget(hit.transform);
+                    _checkTarget = false;
+                }
+
+                transform.SetParent(_target);
+                _rb.isKinematic = true;
+
+                if (_player != null)
+                {
+                    
+                }
+                else if (_turrets != null)
+                {
+                    
+                }
+
+                if (_timePass > _accelTypeStats.Duration)
+                {
+                    transform.SetParent(null);
+                    GameLoopManager.Instance.Ennemies -= Corrosion;
+                    Destroy(gameObject);
+                }
+            }
+        }
     }
 
     private void OnDestroy()

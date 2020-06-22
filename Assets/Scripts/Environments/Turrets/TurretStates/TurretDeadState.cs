@@ -14,6 +14,12 @@ public class TurretDeadState : ITurrets
     void ITurrets.Enter()
     {
         //FX SOUND ANIM
+        _self.gameObject.AddComponent<Rigidbody>();
+
+        Rigidbody rigidbody = _self.GetComponent<Rigidbody>();
+
+        rigidbody.isKinematic = false;
+        rigidbody.useGravity = true;
     }
 
     void ITurrets.Exit()
