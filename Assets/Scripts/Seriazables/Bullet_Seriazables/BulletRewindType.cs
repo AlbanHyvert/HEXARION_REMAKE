@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class BulletRewindType : MonoBehaviour
+public class BulletRewindType
 {
     [SerializeField] private double _speed = 5;
     [SerializeField] private Transform _target = null;

@@ -11,11 +11,10 @@ public class TurretShootingState : ITurrets
     private int _minViewAngle = -70;
     private int _maxViewAngle = 70;
     private double _viewDistance = 30;
-    private float _rotSpeed = 5;
+    private float _currentRotSpeed = 0;
     private double _rotSmooth = 0;
     private int _mag = 5;
     private double _rateOfFire = 2;
-    private float _time = 0;
     private float _timePass = 0;
 
     void ITurrets.Init(TurretsAI self, Projectile projectile)
@@ -29,7 +28,7 @@ public class TurretShootingState : ITurrets
         _maxViewAngle = self.MaxRotationAngle;
         _viewDistance = self.ViewDistance;
         _rotSmooth = self.RotationSmooth;
-        _rotSpeed = (float)self.RotationSpeed;
+        _currentRotSpeed = (float)self.RotationSpeed;
         _rateOfFire = self.RateOfFire;
     }
 
@@ -38,20 +37,20 @@ public class TurretShootingState : ITurrets
         //FX SOUND ANIM
 
         _mag = _self.Magazine;
-        _time = 0;
         _timePass = 0;
+        _currentRotSpeed = 0;
         _player = _self.Player;
     }
 
     void ITurrets.Exit()
     {
-        _time = 0;
+        _currentRotSpeed = 0;
         _timePass = 0;
     }
 
     void ITurrets.Tick()
     {
-        _timePass += 1f *  Time.deltaTime;
+        _timePass += 1 * Time.deltaTime;
 
         if(_mag <= 0)
         {
@@ -62,13 +61,15 @@ public class TurretShootingState : ITurrets
         {
             Quaternion lookTarget = Quaternion.LookRotation((_player.CameraController.transform.position - _transform.position).normalized);
 
-            _transform.rotation = Quaternion.Slerp(_transform.rotation, lookTarget, (_rotSpeed - _self.SlowDownSpeed + _self.AccelSpeed) * Time.deltaTime);
+            _currentRotSpeed = Mathf.Lerp(_currentRotSpeed, (float)_self.RotationSpeed, (float)_rotSmooth * Time.deltaTime);
+
+            _transform.rotation = Quaternion.Slerp(_transform.rotation, lookTarget, _currentRotSpeed * Time.deltaTime);
         }
 
-        if(_timePass > _time)
+        if(_timePass > _rateOfFire)
         {
             _self.Shoot(_bullet, _shootingPos, Quaternion.identity);
-            _time += (float)_rateOfFire + _timePass;
+            _timePass = 0;
             _mag--;
         }
     }

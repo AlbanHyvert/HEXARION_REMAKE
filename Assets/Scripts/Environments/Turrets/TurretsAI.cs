@@ -22,6 +22,7 @@ public class TurretsAI : MonoBehaviour
     private float _slowDownSpeed = 0;
     private float _accelSpeed = 0;
     private double _rotationSpeed = 5;
+    private double _tempRotSpeed = 0;
     private double _rotationSmooth = 5;
     private double _viewDistance = 30;
     private int _minRotationAngle = -70;
@@ -58,12 +59,30 @@ public class TurretsAI : MonoBehaviour
 
     private void SetSlowDownSpeed(float value)
     {
-        _slowDownSpeed = value;
+        if (value > 0)
+        {
+            _slowDownSpeed = value;
+            _rotationSpeed -= _slowDownSpeed;
+        }
+        else
+        {
+            _slowDownSpeed = value;
+            _rotationSpeed = _tempRotSpeed;
+        }
     }
 
     private void SetAccelSpeed(float value)
     {
-        _accelSpeed = value;
+        if(value > 0)
+        {
+            _accelSpeed = value;
+            _rotationSpeed += _accelSpeed;
+        }
+        else
+        {
+            _accelSpeed = value;
+            _rotationSpeed = _tempRotSpeed;
+        } 
     }
 
     private void SetHPValue(int dmg)
@@ -84,6 +103,7 @@ public class TurretsAI : MonoBehaviour
     private void Init()
     {
         _rotationSpeed = _stats.RotationSpeed;
+        _tempRotSpeed = _rotationSpeed;
         _rotationSmooth = _stats.RotationSmooth;
         _viewDistance = _stats.ViewDistance;
         _minRotationAngle = _stats.MinRotationAngle;

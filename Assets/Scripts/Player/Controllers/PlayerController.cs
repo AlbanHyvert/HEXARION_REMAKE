@@ -18,10 +18,12 @@ public class PlayerController : MonoBehaviour
 
     #region PRIVATE
     private Vector3 _startingPos = Vector3.zero;
+    private float _rateOfFire = 0;
     private bool _isHoldingWeapon = false;
     private int _HP = 100;
     private bool _handFull = false;
     private bool _isInteract = false;
+    private bool _isIdle = false;
     private float _speed = 5;
     private float _tempSpeed = 0;
     private float _slowDownSpeed = 0;
@@ -32,6 +34,7 @@ public class PlayerController : MonoBehaviour
     private float _currentSpeed = 0;
     private float _smoothTime = 10f;
     private float _mass = 0;
+    private float _time = 0;
     private float _gravity = 9.81f;
     private int _throwForce = 20;
     private int _maxDistanceInteractable = 10;
@@ -48,6 +51,7 @@ public class PlayerController : MonoBehaviour
     public CameraController CameraController { get { return _cameraController; } }
     public Weapon Weapon { get { return _weapon; } }
     public float Speed { get { return _speed; } }
+    public float RateOfFire { get { return _rateOfFire; } set { _rateOfFire = value; } }
     public float SlowDownSpeed { get { return _slowDownSpeed; } set { SetSlowDownSpeed(value); } }
     public float AccelSpeed { get { return _accelSpeed; } set { SetAccelSpeed(value); } }
     public float Gravity { get { return _gravity; } }
@@ -106,7 +110,7 @@ public class PlayerController : MonoBehaviour
         _throwForce = _interactionStats.ThrowForce;
         _maxDistanceInteractable = _interactionStats.MaxDistanceInteract;
         _activeLayer = _interactionStats.ActiveLayer;
-
+        _rateOfFire = _stats.RateOfFire;
         _speed = _stats.Speed;
         _tempSpeed = _speed;
         _sprintMult = _stats.SprintMult;
@@ -124,22 +128,42 @@ public class PlayerController : MonoBehaviour
         if(_isHoldingWeapon == true)
         {
             _weapon.Player = this;
+            InputManager.Instance.CurrentFireType = E_FireType.CLASSIC;
             InputManager.Instance.Throw += Fire;
         }
         else
         {
+            _weapon.Player = null;
             InputManager.Instance.Throw -= Fire;
         }    
     }
 
     private void SetAccelSpeed(float value)
     {
-        _accelSpeed = value;
+        if (value > 0)
+        {
+            _accelSpeed = value;
+            _speed += _accelSpeed;
+        }
+        else
+        {
+            _accelSpeed = 0;
+            _speed = _tempSpeed;
+        }
     }
 
     private void SetSlowDownSpeed(float slowForce)
     {
-        _slowDownSpeed = slowForce;
+        if(slowForce > 0)
+        {
+            _slowDownSpeed = slowForce;
+            _speed -= _slowDownSpeed;
+        }
+        else
+        {
+            _slowDownSpeed = 0;
+            _speed = _tempSpeed;
+        }
     }
 
     private void SetDmgValue(int dmg)
@@ -206,7 +230,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnIdle()
     {
-        _speed = 0;
+        _isIdle = true;
         //HeadBobbing.OnIdle();
     }
 
@@ -222,9 +246,16 @@ public class PlayerController : MonoBehaviour
 
     private void OnMovements(Vector3 dir)
     {
-        _speed = (_stats.Speed * _sprintMult);
+        _isIdle = false;
 
-        dir *= _currentSpeed / _mass;
+        if(_mass > 0)
+        {
+            dir *= _currentSpeed / _mass;
+        }
+        else
+        {
+            dir *= _currentSpeed;
+        }
 
         _controller.Move(dir * Time.deltaTime);
     }
@@ -257,10 +288,22 @@ public class PlayerController : MonoBehaviour
 
     private void OnUpdate()
     {
-        _currentSpeed = Mathf.Lerp(_currentSpeed, (_speed - _slowDownSpeed + _accelSpeed), _smoothTime * Time.deltaTime);
+        if(_isIdle == false)
+        {
+            _currentSpeed = Mathf.Lerp(_currentSpeed, _speed, _smoothTime * Time.deltaTime);
+        }
+        else
+        {
+            _currentSpeed = Mathf.Lerp(_currentSpeed, 0, _smoothTime * Time.deltaTime);
+        }
 
-        if (_currentSpeed < 0)
+        if(_time < _rateOfFire)
+            _time += 1 * Time.deltaTime;
+
+        if (_currentSpeed <= 0)
+        {
             _currentSpeed = 0;
+        }
 
         OnRaycast();
     }
@@ -312,7 +355,7 @@ public class PlayerController : MonoBehaviour
         {
             _weapon = weapon;
             _weapon.transform.position = _cameraController.GunHolder.position;
-            _weapon.transform.SetParent(_cameraController.transform);
+            _weapon.transform.SetParent(_cameraController.GunHolder);
             IsHoldingAWeapon = true;
         }
     }
@@ -345,7 +388,13 @@ public class PlayerController : MonoBehaviour
     private void Fire()
     {
         if (_weaponAction != null)
-            _weaponAction();
+        {
+            if(_time > _rateOfFire)
+            {
+                _time = 0;
+                _weaponAction();
+            }
+        } 
     }
 
     private void OnDestroy()

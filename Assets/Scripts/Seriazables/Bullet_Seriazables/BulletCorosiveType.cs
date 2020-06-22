@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class BulletCorosiveType : MonoBehaviour
+public class BulletCorosiveType
 {
     [SerializeField] private double _speed = 5;
     [SerializeField] private float _duration = 2;

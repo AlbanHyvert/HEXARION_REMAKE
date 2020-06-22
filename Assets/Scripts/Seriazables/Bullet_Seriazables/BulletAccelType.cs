@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class BulletAccelType : MonoBehaviour
+public class BulletAccelType
 {
     [SerializeField] private double _speed = 5;
     [SerializeField] private float _targetMultSpeed = 2;

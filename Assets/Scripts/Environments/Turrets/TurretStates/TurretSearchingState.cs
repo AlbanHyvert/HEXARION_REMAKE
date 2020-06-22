@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro.EditorUtilities;
 using UnityEngine;
 
 public class TurretSearchingState : ITurrets
@@ -13,7 +14,7 @@ public class TurretSearchingState : ITurrets
     private int _maxRotationAngle = 70;
     private int _viewField = 60;
     private double _viewDistance = 30;
-    private float _rotSpeed = 5;
+    private float _currentRotSpeed = 0;
     private double _rotSmooth = 0;
     private Quaternion _startRotation = Quaternion.identity;
     private Vector3 _startEulerAngle = Vector3.zero;
@@ -31,7 +32,7 @@ public class TurretSearchingState : ITurrets
         _viewField = self.ViewField;
         _viewDistance = self.ViewDistance;
         _rotSmooth = self.RotationSmooth;
-        _rotSpeed = (float)self.RotationSpeed;
+        _currentRotSpeed = 0;
         _player = PlayerManager.Instance.Player;
         _startRotation = self.transform.rotation;
         _startEulerAngle = self.transform.eulerAngles;
@@ -40,18 +41,22 @@ public class TurretSearchingState : ITurrets
     void ITurrets.Enter()
     {
         //FX SOUND ANIM
+        _currentRotSpeed = 0;
         _isAtStartingRot = false;
     }
 
     void ITurrets.Exit()
     {
         //FX SOUND ANIM;
+        _currentRotSpeed = 0;
         _self.Player = _player;
     }
 
     void ITurrets.Tick()
     {
         _player = PlayerManager.Instance.Player;
+
+        _currentRotSpeed = Mathf.Lerp(_currentRotSpeed, (float)_self.RotationSpeed, (float)_rotSmooth * Time.deltaTime);
 
         float angle = Mathf.Abs(Vector3.Angle(_player.transform.position - _self.transform.position + Vector3.up, _self.transform.forward));
 
@@ -75,49 +80,55 @@ public class TurretSearchingState : ITurrets
 
         if (_isAtStartingRot == false)
         {
-            Vector3 StartEulerAngle = new Vector3(_self.transform.eulerAngles.x, _startEulerAngle.y, _self.transform.eulerAngles.z);
-            float distFormOriginalRot = Vector3.Distance(_self.transform.eulerAngles, _startEulerAngle);
-            
-            _self.transform.eulerAngles = Vector3.Lerp(_self.transform.eulerAngles, StartEulerAngle, 1 * Time.deltaTime);
+            Vector3 startEulerAngle = new Vector3(_self.transform.eulerAngles.x, _startEulerAngle.y, _self.transform.eulerAngles.z);
+            float distFormOriginalRot = Vector3.Distance(_self.transform.eulerAngles, startEulerAngle);
 
-            if (distFormOriginalRot < 0.2f)
+            _self.transform.eulerAngles = Vector3.Lerp(_self.transform.eulerAngles, startEulerAngle, _currentRotSpeed * Time.deltaTime);
+
+            if (distFormOriginalRot < 0.1f)
             {
                 _self.transform.eulerAngles = _startEulerAngle;
+                _currentRotSpeed = 0;
                 _timePass = 0;
                 _isAtStartingRot = true;
             }
         }
         else
         {
-            Vector3 minRot = new Vector3(_self.transform.eulerAngles.x, _startEulerAngle.y + _minRotationAngle, _self.transform.eulerAngles.z);
-            Vector3 maxRot = new Vector3(_self.transform.eulerAngles.x, _startEulerAngle.y + _maxRotationAngle, _self.transform.eulerAngles.z);
+            LookAround();
+        }
+    }
 
-            float distFromMinRotation = Vector3.Distance(_self.transform.eulerAngles, minRot);
-            float distFromMaxRotation = Vector3.Distance(_self.transform.eulerAngles, maxRot);
+    private void LookAround()
+    {
+        Vector3 minRot = new Vector3(_self.transform.eulerAngles.x, _startEulerAngle.y + _minRotationAngle, _self.transform.eulerAngles.z);
+        Vector3 maxRot = new Vector3(_self.transform.eulerAngles.x, _startEulerAngle.y + _maxRotationAngle, _self.transform.eulerAngles.z);
 
-            if (_isArrived == false)
+        float distFromMinRotation = Vector3.Distance(_self.transform.eulerAngles, minRot);
+        float distFromMaxRotation = Vector3.Distance(_self.transform.eulerAngles, maxRot);
+
+        if (_isArrived == false)
+        {
+            _self.transform.eulerAngles = Vector3.Lerp(_self.transform.eulerAngles, minRot, (_currentRotSpeed / 2) * Time.deltaTime);
+
+            if (distFromMinRotation < 0.1f)
             {
-                _timePass = Time.deltaTime;
-                _self.transform.eulerAngles = Vector3.Lerp(_self.transform.eulerAngles, minRot, (_rotSpeed - _self.SlowDownSpeed + _self.AccelSpeed) * _timePass);
-
-                if (distFromMinRotation < 0.1f)
-                {
-                    _self.transform.eulerAngles = minRot;
-                    _isArrived = true;
-                    _timePass = 0;
-                }
+                _self.transform.eulerAngles = minRot;
+                _isArrived = true;
+                _currentRotSpeed = 0;
+                _timePass = 0;
             }
-            else
-            {
-                _timePass =  Time.deltaTime;
-                _self.transform.eulerAngles = Vector3.Lerp(_self.transform.eulerAngles, maxRot, (_rotSpeed - _self.SlowDownSpeed + _self.AccelSpeed) * _timePass);
+        }
+        else
+        {
+            _self.transform.eulerAngles = Vector3.Lerp(_self.transform.eulerAngles, maxRot, (_currentRotSpeed / 2) * Time.deltaTime);
 
-                if (distFromMaxRotation < 0.1f)
-                {
-                    _self.transform.eulerAngles = maxRot;
-                    _isArrived = false;
-                    _timePass = 0;
-                }
+            if (distFromMaxRotation < 0.1f)
+            {
+                _self.transform.eulerAngles = maxRot;
+                _isArrived = false;
+                _currentRotSpeed = 0;
+                _timePass = 0;
             }
         }
     }

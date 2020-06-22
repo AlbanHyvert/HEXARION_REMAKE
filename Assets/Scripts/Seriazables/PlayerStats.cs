@@ -4,6 +4,7 @@
 public class PlayerStats
 {
     [SerializeField] private float _speed = 5;  
+    [SerializeField] private float _rateOfFire = 1;  
     [SerializeField] private int _sprintMinMult = 1;
     [SerializeField] private int _sprintMaxMult = 2;
     [SerializeField] private float _mass = 0.5f;
@@ -14,6 +15,7 @@ public class PlayerStats
 
     public int HP { get { return _HP; } }
     public float Speed { get { return _speed; } }
+    public float RateOfFire { get { return _rateOfFire; } }
     public int SprintMult { get { return _sprintMult; } }
     public int SprintMinMult { get { return _sprintMinMult; } }
     public int SprintMaxMult { get { return _sprintMaxMult; } }

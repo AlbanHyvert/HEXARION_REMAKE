@@ -492,6 +492,7 @@ MonoBehaviour:
   _cameraController: {fileID: 3289561592328960500}
   _stats:
     _speed: 10
+    _rateOfFire: 1
     _sprintMinMult: 1
     _sprintMaxMult: 1
     _mass: 1

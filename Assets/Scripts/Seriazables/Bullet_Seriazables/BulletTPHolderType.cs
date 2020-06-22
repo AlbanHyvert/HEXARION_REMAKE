@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class BulletTPHolderType : MonoBehaviour
+public class BulletTPHolderType
 {
     [SerializeField] private double _speed = 5;
     [SerializeField] private Transform _holder = null;

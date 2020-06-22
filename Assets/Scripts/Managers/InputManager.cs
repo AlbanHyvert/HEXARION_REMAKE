@@ -16,9 +16,9 @@ public class InputManager : Singleton<InputManager>
     }
 
     [SerializeField] private DataKeycode _dataKeyCode = null;
-    private int _verticalSensitivity = 10; 
-    private int _horizontalSensitivity = 10;
 
+    private int _verticalSensitivity = 10;
+    private int _horizontalSensitivity = 10;
     private Vector3 _direction = Vector3.zero;
     private E_FireType _currentBulletType = E_FireType.CLASSIC;
 
@@ -26,7 +26,6 @@ public class InputManager : Singleton<InputManager>
     public int VerticalSensitivity { get { return _verticalSensitivity; } set { _verticalSensitivity = value; } }
     public int HorizontalSensitivity { get { return _horizontalSensitivity; } set { _horizontalSensitivity = value; } }
     public  DataKeycode DataKeycode { get { return _dataKeyCode; } }
-
     public E_FireType CurrentFireType { get { return _currentBulletType; } set { SetCurrentBulletType(value); } }
 
     #region EVENTS

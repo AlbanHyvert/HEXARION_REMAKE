@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Projectile : MonoBehaviour
@@ -18,6 +19,7 @@ public class Projectile : MonoBehaviour
     [SerializeField] private Transform _teleportHolder = null;
     #endregion SERIALIZEFIELD
 
+    private bool _checkTarget = true;
     private Rigidbody _rb = null;
     private Collider _col = null;
     private float _lifeTime = 0;
@@ -27,6 +29,8 @@ public class Projectile : MonoBehaviour
     private Transform _teleportationPoint = null;
     private Transform _holder = null;
     private float _timePass = 0;
+
+    public E_BulletType Type { get { return _type; } }
     public Transform TeleportAtPosition { get { return _teleportAtPosition; } set { _teleportAtPosition = value; } }
     public Transform TeleportHolder { get { return _teleportHolder; } set { _teleportHolder = value; } }
     public Transform Target { get { return _target; } set { SetTarget(value); ; } }
@@ -63,8 +67,6 @@ public class Projectile : MonoBehaviour
             default:
                 break;
         }
-
-        SetTarget(target);
     }
 
     private void Awake()
@@ -92,39 +94,46 @@ public class Projectile : MonoBehaviour
 
     private void ClassicType()
     {
-        if(_target == null)
-        {
-            Destroy(gameObject);
-        }
-
         transform.position += transform.forward * ((float)_classicTypeStats.Speed * Time.deltaTime);
 
-        if (Time.time > _lifeTime)
+        _timePass += 1 * Time.deltaTime;
+
+        if (_timePass > _lifeTime)
         {
             Destroy(gameObject);
         }
 
-        bool HasTarget = Physics.Linecast(transform.position, _target.transform.position);
+        RaycastHit hit;
 
-        if (HasTarget == true)
+        bool hasTarget = Physics.Raycast(transform.position, transform.forward, out hit, (float)_classicTypeStats.MaxDistanceCheck);
+
+        if(hasTarget == true)
         {
-            float DistFromPlayer = Vector3.Distance(transform.position, _target.transform.position);
+            Debug.Log(hit.transform.name);
 
-            if (DistFromPlayer < 3 && DistFromPlayer > 2)
+            float distFromTarget = Vector3.Distance(transform.position, hit.transform.position);
+
+            if (distFromTarget < 3 && distFromTarget > 0)
             {
-                if(_player != null)
+                if (_checkTarget == true)
+                {
+                    SetTarget(hit.transform);
+                    _checkTarget = false;
+                }
+
+                if (_player != null)
                 {
                     _player.SetDamageValue = _classicTypeStats.Damage;
                 }
-                else if(_turrets != null)
+                else if (_turrets != null)
                 {
                     _turrets.HP = _classicTypeStats.Damage;
                 }
-                
+
                 GameLoopManager.Instance.Ennemies -= ClassicType;
                 Destroy(gameObject);
             }
-        }
+        }    
     }
 
     private void TeleportTarget()
@@ -324,11 +333,6 @@ public class Projectile : MonoBehaviour
     private void Corrosion()
     {
 
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Destroy(gameObject,1);
     }
 
     private void OnDestroy()

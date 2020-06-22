@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class BulletTPAtType : MonoBehaviour
+public class BulletTPAtType
 {
     [SerializeField] private double _speed = 5;
     [SerializeField] private Transform _teleportationPoint = null;
