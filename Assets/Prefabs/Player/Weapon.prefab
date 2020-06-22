@@ -80,8 +80,8 @@ MonoBehaviour:
   _shootingObj: {fileID: 1976092743}
   _classic: {fileID: 6548633996982531654, guid: 2e1defff61a2ad2469d62b31c7c32619,
     type: 3}
-  _alt_1: {fileID: 0}
-  _alt_2: {fileID: 0}
+  _alt_1: {fileID: 4393442334191654867, guid: 98100cffa88ad1d40b3ba623a5bb6e86, type: 3}
+  _alt_2: {fileID: 8068492426840187743, guid: 4605cdfb7845cf949afa0951f79ff17b, type: 3}
   _alt_3: {fileID: 0}
 --- !u!65 &7636570589808432947
 BoxCollider:

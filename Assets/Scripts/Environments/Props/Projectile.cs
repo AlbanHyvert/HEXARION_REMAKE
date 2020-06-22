@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Projectile : MonoBehaviour
@@ -19,6 +20,7 @@ public class Projectile : MonoBehaviour
     #endregion SERIALIZEFIELD
 
     #region PRIVATE
+    private bool _effectActivated = false;
     private bool _checkTarget = true;
     private Rigidbody _rb = null;
     private Collider _col = null;
@@ -74,6 +76,10 @@ public class Projectile : MonoBehaviour
 
     private void Awake()
     {
+        E_BulletType type = _type;
+
+        _type = type;
+
         _rb = GetComponent<Rigidbody>();
         _col = GetComponent<Collider>();
     }
@@ -218,10 +224,14 @@ public class Projectile : MonoBehaviour
     {
         if (transform.parent == null)
             transform.position += transform.forward * ((float)_slowTypeStats.Speed * Time.deltaTime);
+        else
+        {
+            transform.position = transform.position;
+        }
 
         _timePass += 1 * Time.deltaTime;
 
-        if (_timePass > _slowTypeStats.LifeTime)
+        if (_effectActivated == false && _timePass > _slowTypeStats.LifeTime)
         {
             transform.SetParent(null);
 
@@ -236,7 +246,7 @@ public class Projectile : MonoBehaviour
 
         RaycastHit hit;
 
-        bool hasTarget = Physics.Raycast(transform.position, transform.forward, out hit, (float)_classicTypeStats.MaxDistanceCheck);
+        bool hasTarget = Physics.Raycast(transform.position, transform.forward, out hit, (float)_slowTypeStats.MaxDistanceCheck);
 
         if (hasTarget == true)
         {
@@ -253,13 +263,18 @@ public class Projectile : MonoBehaviour
                 transform.SetParent(hit.transform);
                 _rb.isKinematic = true;
 
-                if (_player != null)
+                if(_effectActivated == false)
                 {
-                    _player.SlowDownSpeed = _slowTypeStats.TargetDivideSpeed;
-                }
-                else if (_turrets != null)
-                {
-                    _turrets.SlowDownSpeed = _slowTypeStats.TargetDivideSpeed;
+                    if (_player != null)
+                    {
+                        _player.SlowDownSpeed = _slowTypeStats.TargetDivideSpeed;
+                        _effectActivated = true;
+                    }
+                    else if (_turrets != null)
+                    {
+                        _turrets.SlowDownSpeed = _slowTypeStats.TargetDivideSpeed;
+                        _effectActivated = true;
+                    }
                 }
 
                 if (_timePass > _accelTypeStats.Duration)
@@ -291,7 +306,7 @@ public class Projectile : MonoBehaviour
 
         _timePass += 1 * Time.deltaTime;
 
-        if (_timePass > _accelTypeStats.LifeTime)
+        if (_effectActivated == false && _timePass > _accelTypeStats.LifeTime)
         {
             transform.SetParent(null);
 
@@ -323,13 +338,18 @@ public class Projectile : MonoBehaviour
                 transform.SetParent(hit.transform);
                 _rb.isKinematic = true;
 
-                if (_player != null)
+                if(_effectActivated == false)
                 {
-                    _player.AccelSpeed = _accelTypeStats.TargetMultSpeed;
-                }
-                else if (_turrets != null)
-                {
-                    _turrets.AccelSpeed = _accelTypeStats.TargetMultSpeed;
+                    if (_player != null)
+                    {
+                        _player.AccelSpeed = _accelTypeStats.TargetMultSpeed;
+                        _effectActivated = true;
+                    }
+                    else if (_turrets != null)
+                    {
+                        _turrets.AccelSpeed = _accelTypeStats.TargetMultSpeed;
+                        _effectActivated = true;
+                    }
                 }
 
                 if (_timePass > _accelTypeStats.Duration)

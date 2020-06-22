@@ -72,17 +72,20 @@ public class Weapon : MonoBehaviour
 
     private void Alt_1()
     {
-        Instantiate(_alt_1, _shootingObj.position, _shootingObj.rotation);
+        Projectile projectile = Instantiate(_alt_1, _shootingObj.position, _shootingObj.rotation);
+        projectile.Init();
     }
 
     private void Alt_2()
     {
-        Instantiate(_alt_2, _shootingObj.position, _shootingObj.rotation);
+        Projectile projectile = Instantiate(_alt_2, _shootingObj.position, _shootingObj.rotation);
+        projectile.Init();
     }
 
     private void Alt_3()
     {
-        Instantiate(_alt_3, _shootingObj.position, _shootingObj.rotation);
+        Projectile projectile = Instantiate(_alt_3, _shootingObj.position, _shootingObj.rotation);
+        projectile.Init();
     }
 
     private void OnDestroy()

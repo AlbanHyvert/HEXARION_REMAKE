@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8101726007923955221
+--- !u!1 &5005605922183332620
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,48 +8,48 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5644258016810480596}
-  - component: {fileID: 622393079917521226}
-  - component: {fileID: 750536649079414417}
-  - component: {fileID: 432629009656842041}
-  - component: {fileID: 1268701796266684411}
-  - component: {fileID: 6548633996982531654}
+  - component: {fileID: 8884491775426569933}
+  - component: {fileID: 4448236764412820563}
+  - component: {fileID: 4571736270799621000}
+  - component: {fileID: 3682081077803717152}
+  - component: {fileID: 2631005423820192482}
+  - component: {fileID: 8068492426840187743}
   m_Layer: 0
-  m_Name: ClassicProjectile
+  m_Name: AccelProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5644258016810480596
+--- !u!4 &8884491775426569933
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8101726007923955221}
+  m_GameObject: {fileID: 5005605922183332620}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.014, y: 0.0839, z: 2.209}
+  m_LocalPosition: {x: -4.353351, y: 6.693491, z: -4.775138}
   m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &622393079917521226
+--- !u!33 &4448236764412820563
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8101726007923955221}
+  m_GameObject: {fileID: 5005605922183332620}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &750536649079414417
+--- !u!23 &4571736270799621000
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8101726007923955221}
+  m_GameObject: {fileID: 5005605922183332620}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -60,7 +60,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ceff9cc21cc6a9944b2bf13dba1a4216, type: 2}
+  - {fileID: 2100000, guid: a282f7249b3cbb84eafe739498f23074, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -80,42 +80,42 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!135 &432629009656842041
+--- !u!135 &3682081077803717152
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8101726007923955221}
+  m_GameObject: {fileID: 5005605922183332620}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &1268701796266684411
+--- !u!54 &2631005423820192482
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8101726007923955221}
+  m_GameObject: {fileID: 5005605922183332620}
   serializedVersion: 2
-  m_Mass: 0.1
+  m_Mass: 0.01
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &6548633996982531654
+--- !u!114 &8068492426840187743
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8101726007923955221}
+  m_GameObject: {fileID: 5005605922183332620}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 27a61744510f5ae41bc81e1176689c16, type: 3}
@@ -127,13 +127,13 @@ MonoBehaviour:
     _lifeTime: 10
     _maxDistanceCheck: 5
   _accelTypeStats:
-    _speed: 5
+    _speed: 15
     _targetMultSpeed: 2
     _duration: 5
     _lifeTime: 10
     _maxDistanceCheck: 5
   _slowTypeStats:
-    _speed: 5
+    _speed: 15
     _targetDivideSpeed: 2
     _duration: 2
     _lifeTime: 10
@@ -160,6 +160,6 @@ MonoBehaviour:
     _teleportationPoint: {fileID: 0}
     _lifeTime: 10
     _maxDistanceCheck: 5
-  _type: 0
+  _type: 5
   _teleportAtPosition: {fileID: 0}
   _teleportHolder: {fileID: 0}
